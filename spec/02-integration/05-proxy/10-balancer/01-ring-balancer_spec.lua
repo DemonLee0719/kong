@@ -1391,6 +1391,12 @@ for _, strategy in helpers.each_strategy() do
               assert.is.table(health)
               assert.is.table(health.data)
 
+              assert.same({
+                available = 100,
+                unavailable = 0,
+                total = 100,
+              }, health.data.details.weight)
+
               if health_threshold[i] < 100 then
                 assert.equals("HEALTHY", health.data.health)
               else
@@ -1400,6 +1406,11 @@ for _, strategy in helpers.each_strategy() do
               -- 75% healthy
               post_target_address_health(upstream_id, "health-threshold.test:80", "127.0.0.1:80", "unhealthy")
               health = get_balancer_health(upstream_name)
+              assert.same({
+                available = 75,
+                unavailable = 25,
+                total = 100,
+              }, health.data.details.weight)
               if health_threshold[i] < 75 then
                 assert.equals("HEALTHY", health.data.health)
               else
@@ -1409,6 +1420,11 @@ for _, strategy in helpers.each_strategy() do
               -- 50% healthy
               post_target_address_health(upstream_id, "health-threshold.test:80", "127.0.0.2:80", "unhealthy")
               health = get_balancer_health(upstream_name)
+              assert.same({
+                available = 50,
+                unavailable = 50,
+                total = 100,
+              }, health.data.details.weight)
               if health_threshold[i] < 50 then
                 assert.equals("HEALTHY", health.data.health)
               else
@@ -1418,6 +1434,11 @@ for _, strategy in helpers.each_strategy() do
               -- 25% healthy
               post_target_address_health(upstream_id, "health-threshold.test:80", "127.0.0.3:80", "unhealthy")
               health = get_balancer_health(upstream_name)
+              assert.same({
+                available = 25,
+                unavailable = 75,
+                total = 100,
+              }, health.data.details.weight)
               if health_threshold[i] < 25 then
                 assert.equals("HEALTHY", health.data.health)
               else
@@ -1427,6 +1448,11 @@ for _, strategy in helpers.each_strategy() do
               -- 0% healthy
               post_target_address_health(upstream_id, "health-threshold.test:80", "127.0.0.4:80", "unhealthy")
               health = get_balancer_health(upstream_name)
+              assert.same({
+                available = 0,
+                unavailable = 100,
+                total = 100,
+              }, health.data.details.weight)
               assert.equals("UNHEALTHY", health.data.health)
 
             end
